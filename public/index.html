@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>wechat</title>
+</head>
+<body>
+	<div>
+		Username:<input type="text" id="username">
+		<input type="button" value="Login" onclick="login()"> 
+	</div>
+	<div>
+
+		To:<input type="text" id="receiver">
+		Message:<input type="text" id="message">
+		<input type="button" value="Send" onclick="sendMessage()">
+	</div>
+
+	<div id="chat">
+
+	</div>
+
+	<div id="active_users">
+	</div>
+
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+ 	var socket = io();
+
+
+	function sendMessage() {
+		var user = document.getElementById("receiver").value
+		var msg = document.getElementById("message").value;
+	  	console.log(msg);
+	  	socket.emit('message',{name:user,message:msg});
+	}
+
+	function login(){
+		var username = document.getElementById("username").value;
+		socket.emit('user',username); 
+	}
+
+	socket.on("sendMsg",function (data) {
+		console.log('got something');
+		var para = document.createElement("h3");
+		var node = document.createTextNode(data);
+		para.appendChild(node);
+		var element = document.getElementById("chat");
+		element.appendChild(para);
+	});
+
+	socket.on('broadcast',function(data){
+		var element = document.getElementById("active_users");
+		while (element.hasChildNodes()) {
+    		element.removeChild(element.lastChild);
+		}
+		for(i in data){
+			console.log(data[i])
+			var para = document.createElement("h3");
+			var node = document.createTextNode(data[i]);
+			para.appendChild(node);
+			element.appendChild(para);
+		}
+
+	});
+
+
+	</script>
+
+</body>
+</html>
